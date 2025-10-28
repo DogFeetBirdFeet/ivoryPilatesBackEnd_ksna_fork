@@ -21,6 +21,9 @@
             <if test="dto.userId != null and dto.userId != ''">
                 AND USER_ID = #{dto.userId}
             </if>
+            <if test="dto.mstId != null and dto.mstId != ''">
+                AND MST_ID = #{dto.mstId}
+            </if>
             <if test="dto.acctId != null and dto.acctId != ''">
                 AND ACCT_ID = #{dto.acctId}
             </if>

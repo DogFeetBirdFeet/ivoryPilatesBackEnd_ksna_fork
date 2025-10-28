@@ -7,6 +7,7 @@ public class TestSearchDto {
 
 	private int userId;
 	private int acctId;
+	private int mstId;
 	private String payMethod;
 	private String useYn;
 	private String refundYn;
