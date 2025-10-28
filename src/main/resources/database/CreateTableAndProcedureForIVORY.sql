@@ -36,6 +36,7 @@ DROP EVENT IF EXISTS EV_UPDATE_CUS_REST;
 
 DROP PROCEDURE IF EXISTS F_MAKE_CLS_PASS;
 
+DROP VIEW IF EXISTS `CUS_MST_VIEW`;
 DROP VIEW IF EXISTS `CLS_VIEW`;
 DROP VIEW IF EXISTS `CAL_HOLI_VIEW`;
 DROP VIEW IF EXISTS `CAL_SCH_VIEW`;
@@ -308,20 +309,24 @@ CREATE TABLE `CERTIFICATE`
     COMMENT = '자격증';
 
 
+
+ALTER TABLE CUS_GRP
+    ADD COLUMN CLS_FLAG ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분';
 -- ======================
 -- 등록 그룹
 -- ======================
 CREATE TABLE `CUS_GRP`
 (
     `GRP_CUS_ID` BIGINT      NOT NULL COMMENT '그룹 고객 관계 아이디' AUTO_INCREMENT,
-    `CUS_ID_1`   BIGINT      DEFAULT NULL COMMENT '아이디1',
-    `CUS_ID_2`   BIGINT      DEFAULT NULL COMMENT '아이디2',
-    `CUS_ID_3`   BIGINT      DEFAULT NULL COMMENT '아이디3',
-    `CUS_ID_4`   BIGINT      DEFAULT NULL COMMENT '아이디4',
+    `CUS_ID_1`   BIGINT          DEFAULT NULL COMMENT '아이디1',
+    `CUS_ID_2`   BIGINT          DEFAULT NULL COMMENT '아이디2',
+    `CUS_ID_3`   BIGINT          DEFAULT NULL COMMENT '아이디3',
+    `CUS_ID_4`   BIGINT          DEFAULT NULL COMMENT '아이디4',
+    `CUS_FLAG`   ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분',
     `REG_DTM`    VARCHAR(14) NOT NULL COMMENT '등록일시',
     `REG_ID`     VARCHAR(20) NOT NULL COMMENT '등록계정 아이디',
-    `MOD_DTM`    VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
-    `MOD_ID`     VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
+    `MOD_DTM`    VARCHAR(14)     DEFAULT NULL COMMENT '수정일시',
+    `MOD_ID`     VARCHAR(20)     DEFAULT NULL COMMENT '수정계정 아이디',
     PRIMARY KEY (`GRP_CUS_ID`)
 )
     COMMENT = '등록 가족';
@@ -877,7 +882,58 @@ END$$
 
 DELIMITER ;
 
-
+-- ======================
+-- 고객 마스터 테이블 뷰
+-- ======================
+CREATE VIEW CUS_MST_VIEW AS
+SELECT T1.MST_ID,
+       T1.NAME,
+       T1.CONTACT,
+       T1.GENDER,
+       T1.BIRTH_DATE,
+       T1.BLACK_YN,
+       T1.REMARK                                                         AS MST_REMARK,
+       CASE
+           WHEN T2.MST_ID IS NOT NULL THEN 'C'
+           WHEN T3.MST_ID IS NOT NULL THEN 'R'
+           WHEN T4.MST_ID IS NOT NULL THEN 'W'
+           END                                                           AS CUS_TYPE,
+       COALESCE(T2.HEIGHT, T3.HEIGHT, T4.HEIGHT)                         AS HEIGHT,
+       COALESCE(T2.WEIGHT, T3.WEIGHT, T4.WEIGHT)                         AS WEIGHT,
+       COALESCE(T2.DISEASE, T3.DISEASE, T4.DISEASE)                      AS DISEASE,
+       COALESCE(T2.SUR_HIST, T3.SUR_HIST, T4.SUR_HIST)                   AS SUR_HIST,
+       COALESCE(T2.BODY_CHECK_IMG, T3.BODY_CHECK_IMG, T4.BODY_CHECK_IMG) AS BODY_CHECK_IMG,
+       COALESCE(T2.REMARK, T3.REMARK, T4.REMARK)                         AS REMARK,
+       COALESCE(T3.LAST_CLS_DATE, T4.LAST_CLS_DATE)                      AS LAST_CLS_DATE,
+       COALESCE(T3.FAM_CUS_YN, T4.FAM_CUS_YN)                            AS FAM_CUS_YN,
+       T2.CONS_DATE,
+       T3.FX_CLS_YN,
+       T3.FX_CLS_DAY,
+       T3.FX_CLS_TM,
+       T3.REST_YN,
+       T3.REST_DTM,
+       T4.DEL_DTM,
+       T5.GRP_CUS_ID,
+       T5.CUS_ID_1,
+       T5.CUS_ID_2,
+       T5.CUS_ID_3,
+       T5.CUS_ID_4,
+       T5.CLS_FLAG,
+       T1.REG_DTM,
+       T1.REG_ID,
+       T1.MOD_DTM,
+       T1.MOD_ID
+FROM CUS_MST T1 -- 마스터
+         LEFT OUTER JOIN CUS_CONS T2 -- 상담
+                         ON T1.MST_ID = T2.MST_ID
+         LEFT OUTER JOIN CUS_REG T3 -- 등록
+                         ON T1.MST_ID = T3.MST_ID
+         LEFT OUTER JOIN CUS_WDR T4 -- 탈퇴
+                         ON T1.MST_ID = T4.MST_ID
+         LEFT OUTER JOIN CUS_GRP T5 -- 그룹
+                         ON (T1.MST_ID = T5.CUS_ID_1 OR
+                             T1.MST_ID = T5.CUS_ID_2)
+;
 -- ======================
 -- 상품-수강권-결제 정보 뷰
 -- ======================
