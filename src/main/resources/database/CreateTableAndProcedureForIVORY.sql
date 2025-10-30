@@ -308,16 +308,13 @@ CREATE TABLE `CERTIFICATE`
 )
     COMMENT = '자격증';
 
-
-
-ALTER TABLE CUS_GRP
-    ADD COLUMN CLS_FLAG ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분';
 -- ======================
 -- 등록 그룹
 -- ======================
 CREATE TABLE `CUS_GRP`
 (
     `GRP_CUS_ID` BIGINT      NOT NULL COMMENT '그룹 고객 관계 아이디' AUTO_INCREMENT,
+    `CLS_FLAG`   ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분',
     `CUS_ID_1`   BIGINT          DEFAULT NULL COMMENT '아이디1',
     `CUS_ID_2`   BIGINT          DEFAULT NULL COMMENT '아이디2',
     `CUS_ID_3`   BIGINT          DEFAULT NULL COMMENT '아이디3',
@@ -572,25 +569,30 @@ CREATE TABLE `CODE_DTL`
 )
     COMMENT = '공통코드 세부관리';
 
-
 -- ======================
 -- 결제 정보
 -- ======================
 CREATE TABLE `CLS_PAY_INFO`
 (
-    `PAY_ID`     BIGINT                   NOT NULL COMMENT '결제 정보 아이디' AUTO_INCREMENT,
-    `CLS_PKG_ID` BIGINT                   NOT NULL COMMENT '회차 상품 아이디',
-    `PAID_FLAG`  ENUM ('PAY','DIS','REF') NOT NULL COMMENT '결제 구분',
-    `PAID_AMT`   INT                      NOT NULL COMMENT '금액',
-    `PAY_METHOD` ENUM ('CARD','CASH')     NOT NULL COMMENT '결제 수단',
-    `REG_DTM`    VARCHAR(14)              NOT NULL COMMENT '등록일시',
-    `REG_ID`     VARCHAR(20)              NOT NULL COMMENT '등록계정 아이디',
-    `MOD_DTM`    VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
-    `MOD_ID`     VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
+    `PAY_ID`      BIGINT                   NOT NULL COMMENT '결제 정보 아이디' AUTO_INCREMENT,
+    `CLS_PKG_ID`  BIGINT                   NOT NULL COMMENT '회차 상품 아이디',
+    `CLS_PASS_ID` BIGINT                   NOT NULL COMMENT '결제 수강권 아이디',
+    `PAID_FLAG`   ENUM ('PAY','DIS','REF') NOT NULL COMMENT '결제 구분',
+    `PAID_AMT`    INT                      NOT NULL COMMENT '금액',
+    `PAY_METHOD`  ENUM ('CARD','CASH')     NOT NULL COMMENT '결제 수단',
+    `REG_DTM`     VARCHAR(14)              NOT NULL COMMENT '등록일시',
+    `REG_ID`      VARCHAR(20)              NOT NULL COMMENT '등록계정 아이디',
+    `MOD_DTM`     VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
+    `MOD_ID`      VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
     PRIMARY KEY (`PAY_ID`),
     CONSTRAINT `FK_CLS_PASS_TO_CLS_PAY_INFO`
         FOREIGN KEY (`CLS_PKG_ID`)
             REFERENCES `CLS_PASS` (`CLS_PKG_ID`)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    CONSTRAINT `FK_CLS_PKG_TO_CLS_PAY_INFO`
+        FOREIGN KEY (`CLS_PASS_ID`)
+            REFERENCES `CLS_PASS` (`CLS_PASS_ID`)
             ON UPDATE CASCADE
             ON DELETE CASCADE
 )
@@ -1090,6 +1092,87 @@ VALUES (5, 'PWD', '강사03', F_GET_RANDOM_CONTACT(),
         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
         DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 
+INSERT
+/*+
+                 SET_VAR(cte_max_recursion_depth=20000)
+                 SET_VAR(net_read_timeout=600)
+                 SET_VAR(net_write_timeout=600)
+                 SET_VAR(max_execution_time=0)
+               */
+INTO CAL_MST
+( YEAR
+, MONTH
+, DAY
+, KOR_DATE
+, SCHED_DATE
+, SCHED_TIME
+, REG_DTM
+, REG_ID
+, MOD_DTM
+, MOD_ID)
+-- 지정범위 일자 구하기
+WITH RECURSIVE
+    BASE AS ( -- 100일씩 이동
+        SELECT DATE(I_STA_YMD) AS D
+        UNION ALL
+        SELECT D + INTERVAL 100 DAY
+        FROM BASE
+        WHERE D <= DATE('29991231') - INTERVAL 100 DAY),
+    DIGITS AS (SELECT 0 N
+               UNION ALL
+               SELECT 1
+               UNION ALL
+               SELECT 2
+               UNION ALL
+               SELECT 3
+               UNION ALL
+               SELECT 4
+               UNION ALL
+               SELECT 5
+               UNION ALL
+               SELECT 6
+               UNION ALL
+               SELECT 7
+               UNION ALL
+               SELECT 8
+               UNION ALL
+               SELECT 9),
+    NUMS AS ( -- 0..99
+        SELECT t.N * 10 + u.N AS N
+        FROM DIGITS t
+                 CROSS JOIN DIGITS u),
+    HOURS AS ( -- 0..23
+        SELECT t.N * 10 + u.N AS H
+        FROM DIGITS t
+                 CROSS JOIN DIGITS u
+        WHERE t.N * 10 + u.N BETWEEN 9 AND 23),
+    CAL AS (SELECT DATE_ADD(BASE.D, INTERVAL NUMS.N DAY)          AS NUM_DATE
+                 , LPAD(HOURS.H, 2, '0')                          AS HOUR_24
+                 , DAYNAME(DATE_ADD(BASE.D, INTERVAL NUMS.N DAY)) AS ENG_DATE
+            FROM BASE
+                     CROSS JOIN NUMS
+                     CROSS JOIN HOURS
+            WHERE DATE_ADD(BASE.D, INTERVAL NUMS.N DAY) BETWEEN DATE('20001231') AND DATE('29991231'))
+SELECT DATE_FORMAT(NUM_DATE, '%Y')     AS YEAR
+     , DATE_FORMAT(NUM_DATE, '%m')     AS MONTH
+     , DATE_FORMAT(NUM_DATE, '%d')     AS DAY
+     , CASE ENG_DATE
+           WHEN 'Monday' THEN '월요일'
+           WHEN 'Tuesday' THEN '화요일'
+           WHEN 'Wednesday' THEN '수요일'
+           WHEN 'Thursday' THEN '목요일'
+           WHEN 'Friday' THEN '금요일'
+           WHEN 'Saturday' THEN '토요일'
+           WHEN 'Sunday' THEN '일요일'
+    END                                AS KOR_DATE
+     , DATE_FORMAT(NUM_DATE, '%Y%m%d') AS SCHED_DATE
+     , HOUR_24                         AS SCHED_TIME
+     , DATE_FORMAT(NOW(), '%Y%m%d')    AS REG_DTM
+     , 'SYS'                           AS REG_ID
+     , DATE_FORMAT(NOW(), '%Y%m%d')    AS MOD_DTM
+     , 'SYS'                           AS MOD_ID
+FROM CAL
+ORDER BY NUM_DATE, HOUR_24;
 
 INSERT INTO CODE_MST
 VALUES (1, 'PAY_DIV', '결제구분', '결제방법을 구분하기 위한 코드', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
