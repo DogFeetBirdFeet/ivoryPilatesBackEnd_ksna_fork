@@ -1001,13 +1001,14 @@ SELECT T4.SCHED_ID
      , T4.TRAINER_NM
      , T4.CUS_NM
      , IF(R.ACCT_OFF = 1, 'Y', 'N')                                                               AS ACCT_OFF_YN
-     , IF(R.HOL = 1, 'Y', 'N')                                                                    AS HOL_YN
+     , IF(R.HOL = 1, 'Y', 'N')                                                            ㅜ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            AS HOL_YN
      , IF(R.HOL = 1, (SELECT HOLI_NM FROM HOLIDAY_MST WHERE HOLI_ID = T2.TAR_ID), '')             AS HOL_NM
      , IF(R.CEN_OFF = 1, 'Y', 'N')                                                                AS CENTER_OFF_YN
      , IF(R.ACCT_OFF = 1, (SELECT CONCAT(NAME, ", ") FROM ACCT WHERE ACCT_ID = T4.ACCT_ID), NULL) AS OFF_ACCT_NM
      , P.GRP_YN
      , IF(P.GRP_YN = 'Y', P.GRP_IDS, NULL)                                                        AS GRP_IDS
      , IF(P.GRP_YN = 'Y', P.GRP_NMS, NULL)                                                        AS GRP_NMS
+     , P.CLS_FLAG
      , T4.CLS_STATUS
      , T4.CLS_SESSION
      , T4.INJURY
@@ -1048,6 +1049,7 @@ FROM CAL_MST T1
                          , P2.GRP_CUS_ID
                          , CONCAT(F_GET_USER_NM(P3.CUS_ID_1, 'C'), ", ", F_GET_USER_NM(P3.CUS_ID_2, 'C')) AS GRP_NMS
                          , CONCAT(P3.CUS_ID_1, ", ", P3.CUS_ID_2)                                         AS GRP_IDS
+                         , P3.CLS_FLAG
                     FROM CLS_PKG P1
                              JOIN CLS_PASS P2
                                   ON P1.CLS_PKG_ID = P2.CLS_PKG_ID
@@ -1113,7 +1115,7 @@ INTO CAL_MST
 -- 지정범위 일자 구하기
 WITH RECURSIVE
     BASE AS ( -- 100일씩 이동
-        SELECT DATE(I_STA_YMD) AS D
+        SELECT DATE('20000101') AS D
         UNION ALL
         SELECT D + INTERVAL 100 DAY
         FROM BASE
