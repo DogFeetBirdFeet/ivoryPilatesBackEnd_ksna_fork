@@ -1001,7 +1001,7 @@ SELECT T4.SCHED_ID
      , T4.TRAINER_NM
      , T4.CUS_NM
      , IF(R.ACCT_OFF = 1, 'Y', 'N')                                                               AS ACCT_OFF_YN
-     , IF(R.HOL = 1, 'Y', 'N')                                                            ㅜ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            AS HOL_YN
+     , IF(R.HOL = 1, 'Y', 'N')                                                            		  AS HOL_YN
      , IF(R.HOL = 1, (SELECT HOLI_NM FROM HOLIDAY_MST WHERE HOLI_ID = T2.TAR_ID), '')             AS HOL_NM
      , IF(R.CEN_OFF = 1, 'Y', 'N')                                                                AS CENTER_OFF_YN
      , IF(R.ACCT_OFF = 1, (SELECT CONCAT(NAME, ", ") FROM ACCT WHERE ACCT_ID = T4.ACCT_ID), NULL) AS OFF_ACCT_NM
