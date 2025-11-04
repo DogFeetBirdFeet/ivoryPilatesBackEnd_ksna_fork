@@ -659,9 +659,9 @@ CREATE TABLE `CAL_MST`
 -- ======================
 CREATE TABLE `CAL_REL`
 (
-    `CAL_ID`   BIGINT                                                                   NOT NULL COMMENT '캘린더 아이디',
-    `CAL_TYPE` ENUM ('SCH_MST', 'SCH_HIST', 'SCH_FIX', 'OFF_DAY', 'HOL_DAY', 'CEN_OFF') NOT NULL COMMENT '캘린더 타입',
-    `TAR_ID`   BIGINT                                                                   NOT NULL COMMENT '대상 아이디',
+    `CAL_ID`   BIGINT                                                                   			NOT NULL COMMENT '캘린더 아이디',
+    `CAL_TYPE` ENUM ('SCH_MST', 'SCH_HIST', 'SCH_FIX', 'OFF_DAY', 'HOL_DAY', 'CEN_OFF', 'ACCT_RES') NOT NULL COMMENT '캘린더 타입',
+    `TAR_ID`   BIGINT                                                                   			NOT NULL COMMENT '대상 아이디',
     PRIMARY KEY (`CAL_ID`, `CAL_TYPE`, `TAR_ID`)
 )
     COMMENT = '캘린더 관계';
@@ -1001,10 +1001,12 @@ SELECT T4.SCHED_ID
      , T4.TRAINER_NM
      , T4.CUS_NM
      , IF(R.ACCT_OFF = 1, 'Y', 'N')                                                               AS ACCT_OFF_YN
+     , IF(R.ACCT_RES = 1, 'Y', 'N')                                                               AS ACCT_RES_YN     
      , IF(R.HOL = 1, 'Y', 'N')                                                            		  AS HOL_YN
      , IF(R.HOL = 1, (SELECT HOLI_NM FROM HOLIDAY_MST WHERE HOLI_ID = T2.TAR_ID), '')             AS HOL_NM
      , IF(R.CEN_OFF = 1, 'Y', 'N')                                                                AS CENTER_OFF_YN
-     , IF(R.ACCT_OFF = 1, (SELECT CONCAT(NAME, ", ") FROM ACCT WHERE ACCT_ID = T4.ACCT_ID), NULL) AS OFF_ACCT_NM
+     , IF(R.ACCT_OFF = 1, (SELECT GROUP_CONCAT(NAME SEPARATOR ', ') FROM ACCT WHERE FIND_IN_SET(ACCT_ID, R.OFF_TAR_IDS)), NULL) AS OFF_ACCT_NM
+     , IF(R.ACCT_RES = 1, (SELECT GROUP_CONCAT(NAME SEPARATOR ', ') FROM ACCT WHERE FIND_IN_SET(ACCT_ID, R.RES_TAR_IDS)), NULL) AS RES_ACCT_NM
      , P.GRP_YN
      , IF(P.GRP_YN = 'Y', P.GRP_IDS, NULL)                                                        AS GRP_IDS
      , IF(P.GRP_YN = 'Y', P.GRP_NMS, NULL)                                                        AS GRP_NMS
@@ -1037,15 +1039,18 @@ FROM CAL_MST T1
                    ON T2.TAR_ID = T4.SCHED_ID
          LEFT JOIN (SELECT CAL_ID
                          , MAX(CAL_TYPE = 'OFF_DAY') AS ACCT_OFF
+                         , MAX(CAL_TYPE = 'ACCT_RES') AS ACCT_RES
                          , MAX(CAL_TYPE = 'HOL_DAY') AS HOL
                          , MAX(CAL_TYPE = 'CEN_OFF') AS CEN_OFF
+						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'OFF_DAY'  THEN TAR_ID END)     AS OFF_TAR_IDS
+						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'ACCT_RES' THEN TAR_ID END)     AS RES_TAR_IDS
                     FROM CAL_REL
                     GROUP BY CAL_ID) R
                    ON R.CAL_ID = T1.CAL_ID
          LEFT JOIN (SELECT P2.MST_ID
                          , P2.STA_DTM
                          , P2.END_DTM
-                         , IF(P1.CLS_TYPE = 'IOI', 'N', 'Y')                                                 GRP_YN
+                         , IF(P1.CLS_TYPE = 'IOI', 'N', 'Y')                                              AS GRP_YN
                          , P2.GRP_CUS_ID
                          , CONCAT(F_GET_USER_NM(P3.CUS_ID_1, 'C'), ", ", F_GET_USER_NM(P3.CUS_ID_2, 'C')) AS GRP_NMS
                          , CONCAT(P3.CUS_ID_1, ", ", P3.CUS_ID_2)                                         AS GRP_IDS
@@ -1277,6 +1282,9 @@ VALUES ('22', '08', 'CAL_TYPE', 'HOL_DAY', '공휴일', '해당 일자가 법정
         DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 INSERT INTO CODE_DTL
 VALUES ('23', '08', 'CAL_TYPE', 'CEN_OFF', '센터 휴무일', '해당 일자가 센터 휴무일인 경우', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO CODE_DTL
+VALUES ('24', '08', 'CAL_TYPE', 'ACCT_RES', '강사 휴식시간', '해당 시간에 강사가 휴식인 경우', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
         DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 
 COMMIT
