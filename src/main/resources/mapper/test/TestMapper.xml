@@ -21,8 +21,14 @@
             <if test="dto.userId != null and dto.userId != ''">
                 AND USER_ID = #{dto.userId}
             </if>
+            <if test="dto.mstId != null and dto.mstId != ''">
+                AND MST_ID = #{dto.mstId}
+            </if>
             <if test="dto.acctId != null and dto.acctId != ''">
                 AND ACCT_ID = #{dto.acctId}
+            </if>
+            <if test="dto.clsPassId != null and dto.clsPassId != ''">
+                AND CLS_PASS_ID = #{dto.clsPassId}
             </if>
             <if test="dto.useYn != null and dto.useYn != ''">
                 AND USE_YN = #{dto.useYn}
