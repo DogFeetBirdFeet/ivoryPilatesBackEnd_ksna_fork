@@ -238,7 +238,7 @@ CREATE TABLE `SCHED_FX`
     `FX_SCHED_ID` BIGINT                             NOT NULL COMMENT '고정 스케줄 시퀀스' AUTO_INCREMENT,
     `MST_ID`      BIGINT                             NOT NULL COMMENT '마스터 고객 아이디',
     `ACCT_ID`     BIGINT                             NOT NULL COMMENT '강사 아이디',
-    `FX_DAY`      ENUM ('1','2','3','4','5','6','7') NOT NULL COMMENT '요일(1:월~7:일)',
+    `FX_DAY`      VARCHAR(20) 						 NOT NULL COMMENT '요일(1:월~7:일)',
     `FX_TIME`     VARCHAR(4)                         NOT NULL COMMENT '시간',
     `REG_DTM`     VARCHAR(14)                        NOT NULL COMMENT '등록일시',
     `REG_ID`      VARCHAR(20)                        NOT NULL COMMENT '등록계정 아이디',
@@ -1037,7 +1037,7 @@ FROM CAL_MST T1
                    ON T2.CAL_ID = T1.CAL_ID
          LEFT JOIN SCHED_MST T4
                    ON T2.TAR_ID = T4.SCHED_ID
-                  AND T2.CAL_TYPE = 'SCH_MST' 
+                  AND T2.CAL_TYPE IN ('SCH_MST', 'SCH_FIX') 
          LEFT JOIN (SELECT CAL_ID
                          , MAX(CAL_TYPE = 'OFF_DAY') AS ACCT_OFF
                          , MAX(CAL_TYPE = 'ACCT_RES') AS ACCT_RES

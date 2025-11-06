@@ -747,7 +747,7 @@ INSERT INTO SCHED_MST
               JOIN ACCT T2
                    ON T1.ACCT_ID = T2.ACCT_ID)
 ;
-
+ 
 INSERT INTO CAL_REL
     (CAL_ID, CAL_TYPE, TAR_ID)
     (SELECT (SELECT CAL_ID
@@ -811,4 +811,39 @@ INSERT INTO CAL_REL
              WHERE SCHED_DATE = '20251109')   
 ;
 
+INSERT INTO SCHED_MST
+(ACCT_ID, MST_ID, TRAINER_NM, CUS_NM, CLS_STATUS, CLS_SESSION, INJURY, HOMEWORK, VIDEO_REC_YN, REST_YN, FX_YN,
+ CLS_NOTE, CLS_NOTE_YN, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (1, 48, '관리자01', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+    VALUES (136090, 'SCH_MST', 129);
+ 
+ INSERT INTO SCHED_FX (MST_ID, ACCT_ID, FX_DAY, FX_TIME, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (37, 2, '1,3', 12, DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+SELECT * FROM SCHED_MST ORDER BY SCHED_ID DESC;
+
+INSERT INTO SCHED_MST 
+(ACCT_ID, MST_ID, TRAINER_NM, CUS_NM, CLS_STATUS, CLS_SESSION, INJURY, HOMEWORK, VIDEO_REC_YN, REST_YN, FX_YN,
+ CLS_NOTE, CLS_NOTE_YN, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+    VALUES (136099, 'SCH_FIX', 130),
+		(136129, 'SCH_FIX', 131),
+		(136204, 'SCH_FIX', 132),
+		(136234, 'SCH_FIX', 133),
+		(136309, 'SCH_FIX', 134),
+		(136339, 'SCH_FIX', 135),
+        (136414, 'SCH_FIX', 136);
+ 
 COMMIT;
