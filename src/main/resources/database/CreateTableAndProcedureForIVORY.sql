@@ -238,7 +238,7 @@ CREATE TABLE `SCHED_FX`
     `FX_SCHED_ID` BIGINT                             NOT NULL COMMENT '고정 스케줄 시퀀스' AUTO_INCREMENT,
     `MST_ID`      BIGINT                             NOT NULL COMMENT '마스터 고객 아이디',
     `ACCT_ID`     BIGINT                             NOT NULL COMMENT '강사 아이디',
-    `FX_DAY`      ENUM ('1','2','3','4','5','6','7') NOT NULL COMMENT '요일(1:월~7:일)',
+    `FX_DAY`      VARCHAR(20) 						 NOT NULL COMMENT '요일(1:월~7:일)',
     `FX_TIME`     VARCHAR(4)                         NOT NULL COMMENT '시간',
     `REG_DTM`     VARCHAR(14)                        NOT NULL COMMENT '등록일시',
     `REG_ID`      VARCHAR(20)                        NOT NULL COMMENT '등록계정 아이디',
@@ -1037,6 +1037,7 @@ FROM CAL_MST T1
                    ON T2.CAL_ID = T1.CAL_ID
          LEFT JOIN SCHED_MST T4
                    ON T2.TAR_ID = T4.SCHED_ID
+                  AND T2.CAL_TYPE IN ('SCH_MST', 'SCH_FIX') 
          LEFT JOIN (SELECT CAL_ID
                          , MAX(CAL_TYPE = 'OFF_DAY') AS ACCT_OFF
                          , MAX(CAL_TYPE = 'ACCT_RES') AS ACCT_RES
@@ -1045,6 +1046,7 @@ FROM CAL_MST T1
 						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'OFF_DAY'  THEN TAR_ID END)     AS OFF_TAR_IDS
 						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'ACCT_RES' THEN TAR_ID END)     AS RES_TAR_IDS
                     FROM CAL_REL
+                   WHERE CAL_TYPE IN ('OFF_DAY', 'ACCT_RES', 'HOL_DAY', 'CEN_OFF') 
                     GROUP BY CAL_ID) R
                    ON R.CAL_ID = T1.CAL_ID
          LEFT JOIN (SELECT P2.MST_ID
@@ -1076,28 +1078,6 @@ INSERT INTO ROLES
 VALUES ('03', 'TRAINER', '강사', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 INSERT INTO ROLES
 VALUES ('04', 'TIME_TRAINER', '시간 강사', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-
-
-INSERT INTO ACCT
-VALUES (1, 'PWD', '관리자01', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (2, 'PWD', '관리자02', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (3, 'PWD', '강사01', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (4, 'PWD', '강사02', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (5, 'PWD', '강사03', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 
 INSERT
 /*+

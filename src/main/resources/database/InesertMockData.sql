@@ -1,5 +1,26 @@
 use ivory;
 
+INSERT INTO ACCT
+VALUES (1, 'PWD', '관리자01', F_GET_RANDOM_CONTACT(),
+        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO ACCT
+VALUES (2, 'PWD', '관리자02', F_GET_RANDOM_CONTACT(),
+        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO ACCT
+VALUES (3, 'PWD', '강사01', F_GET_RANDOM_CONTACT(),
+        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO ACCT
+VALUES (4, 'PWD', '강사02', F_GET_RANDOM_CONTACT(),
+        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO ACCT
+VALUES (5, 'PWD', '강사03', F_GET_RANDOM_CONTACT(),
+        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+        
 INSERT INTO CLS_PKG
 (CLS_PKG_NM, CLS_TYPE, CLS_PKG_CNT, PRICE, DISCOUNT_AMT, INST_YN, INST_MM, USE_YN, EXP_RATE, REMARK,
  REG_DTM, REG_ID, MOD_DTM, MOD_ID)
@@ -726,7 +747,7 @@ INSERT INTO SCHED_MST
               JOIN ACCT T2
                    ON T1.ACCT_ID = T2.ACCT_ID)
 ;
-
+ 
 INSERT INTO CAL_REL
     (CAL_ID, CAL_TYPE, TAR_ID)
     (SELECT (SELECT CAL_ID
@@ -743,3 +764,86 @@ INSERT INTO CAL_REL
 INSERT INTO CAL_REL
 	(CAL_ID, CAL_TYPE, TAR_ID)
 VALUES (136115, 'ACCT_RES', 1);
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+VALUES (136115, 'ACCT_RES', 3);
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+VALUES (136116, 'ACCT_RES', 2);
+
+INSERT INTO CENTER_OFF_MST (OFF_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES ('센터휴무일_임시_01', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+INSERT INTO CENTER_OFF_MST (OFF_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES ('센터휴무일_임시_02', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+INSERT INTO HOLIDAY_MST (HOLI_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES ('법정공휴일_임시_01', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+INSERT INTO HOLIDAY_MST (HOLI_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES ('법정공휴일_임시_02', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+INSERT INTO OFF_DAY_MST (ACCT_ID, TRAINER_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES (1, '관리자01', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+INSERT INTO OFF_DAY_MST (ACCT_ID, TRAINER_NM, REG_DTM, REG_ID, MOD_DTM, MOD_ID) VALUES (2, '관리자02', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+
+SELECT * FROM ACCT;
+
+INSERT INTO CAL_REL
+    (CAL_ID, CAL_TYPE, TAR_ID)
+    (SELECT CAL_ID, 'CEN_OFF', 1
+             FROM CAL_MST
+                      PARTITION (P_UNDER_2025)
+             WHERE SCHED_DATE = '20251103')   
+;
+
+INSERT INTO CAL_REL
+    (CAL_ID, CAL_TYPE, TAR_ID)
+    (SELECT CAL_ID, 'HOL_DAY', 1
+             FROM CAL_MST
+                      PARTITION (P_UNDER_2025)
+             WHERE SCHED_DATE = '20251107')   
+;
+
+INSERT INTO CAL_REL
+    (CAL_ID, CAL_TYPE, TAR_ID)
+    (SELECT CAL_ID, 'OFF_DAY', 1
+             FROM CAL_MST
+                      PARTITION (P_UNDER_2025)
+             WHERE SCHED_DATE = '20251109')   
+;
+
+INSERT INTO SCHED_MST
+(ACCT_ID, MST_ID, TRAINER_NM, CUS_NM, CLS_STATUS, CLS_SESSION, INJURY, HOMEWORK, VIDEO_REC_YN, REST_YN, FX_YN,
+ CLS_NOTE, CLS_NOTE_YN, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (1, 48, '관리자01', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+    VALUES (136090, 'SCH_MST', 129);
+ 
+ INSERT INTO SCHED_FX (MST_ID, ACCT_ID, FX_DAY, FX_TIME, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (37, 2, '1,3', 12, DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+SELECT * FROM SCHED_MST ORDER BY SCHED_ID DESC;
+
+INSERT INTO SCHED_MST 
+(ACCT_ID, MST_ID, TRAINER_NM, CUS_NM, CLS_STATUS, CLS_SESSION, INJURY, HOMEWORK, VIDEO_REC_YN, REST_YN, FX_YN,
+ CLS_NOTE, CLS_NOTE_YN, REG_DTM, REG_ID, MOD_DTM, MOD_ID)
+ VALUES (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys'),
+        (2, 48, '관리자02', '김재린', 'COM', '', '', '', 'N', 'N', 'Y', '', 'N', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys', DATE_FORMAT(NOW(), '%Y%m%d'), 'sys');
+
+INSERT INTO CAL_REL
+	(CAL_ID, CAL_TYPE, TAR_ID)
+    VALUES (136099, 'SCH_FIX', 130),
+		(136129, 'SCH_FIX', 131),
+		(136204, 'SCH_FIX', 132),
+		(136234, 'SCH_FIX', 133),
+		(136309, 'SCH_FIX', 134),
+		(136339, 'SCH_FIX', 135),
+        (136414, 'SCH_FIX', 136);
+ 
+COMMIT;
