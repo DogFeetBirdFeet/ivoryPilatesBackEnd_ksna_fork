@@ -36,6 +36,7 @@ DROP EVENT IF EXISTS EV_UPDATE_CUS_REST;
 
 DROP PROCEDURE IF EXISTS F_MAKE_CLS_PASS;
 
+DROP VIEW IF EXISTS `CUS_MST_VIEW`;
 DROP VIEW IF EXISTS `CLS_VIEW`;
 DROP VIEW IF EXISTS `CAL_HOLI_VIEW`;
 DROP VIEW IF EXISTS `CAL_SCH_VIEW`;
@@ -237,7 +238,7 @@ CREATE TABLE `SCHED_FX`
     `FX_SCHED_ID` BIGINT                             NOT NULL COMMENT '고정 스케줄 시퀀스' AUTO_INCREMENT,
     `MST_ID`      BIGINT                             NOT NULL COMMENT '마스터 고객 아이디',
     `ACCT_ID`     BIGINT                             NOT NULL COMMENT '강사 아이디',
-    `FX_DAY`      ENUM ('1','2','3','4','5','6','7') NOT NULL COMMENT '요일(1:월~7:일)',
+    `FX_DAY`      VARCHAR(20) 						 NOT NULL COMMENT '요일(1:월~7:일)',
     `FX_TIME`     VARCHAR(4)                         NOT NULL COMMENT '시간',
     `REG_DTM`     VARCHAR(14)                        NOT NULL COMMENT '등록일시',
     `REG_ID`      VARCHAR(20)                        NOT NULL COMMENT '등록계정 아이디',
@@ -307,21 +308,22 @@ CREATE TABLE `CERTIFICATE`
 )
     COMMENT = '자격증';
 
-
 -- ======================
 -- 등록 그룹
 -- ======================
 CREATE TABLE `CUS_GRP`
 (
     `GRP_CUS_ID` BIGINT      NOT NULL COMMENT '그룹 고객 관계 아이디' AUTO_INCREMENT,
-    `CUS_ID_1`   BIGINT      DEFAULT NULL COMMENT '아이디1',
-    `CUS_ID_2`   BIGINT      DEFAULT NULL COMMENT '아이디2',
-    `CUS_ID_3`   BIGINT      DEFAULT NULL COMMENT '아이디3',
-    `CUS_ID_4`   BIGINT      DEFAULT NULL COMMENT '아이디4',
+    `CLS_FLAG`   ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분',
+    `CUS_ID_1`   BIGINT          DEFAULT NULL COMMENT '아이디1',
+    `CUS_ID_2`   BIGINT          DEFAULT NULL COMMENT '아이디2',
+    `CUS_ID_3`   BIGINT          DEFAULT NULL COMMENT '아이디3',
+    `CUS_ID_4`   BIGINT          DEFAULT NULL COMMENT '아이디4',
+    `CUS_FLAG`   ENUM ('G', 'S') DEFAULT NULL COMMENT '수업 구분',
     `REG_DTM`    VARCHAR(14) NOT NULL COMMENT '등록일시',
     `REG_ID`     VARCHAR(20) NOT NULL COMMENT '등록계정 아이디',
-    `MOD_DTM`    VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
-    `MOD_ID`     VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
+    `MOD_DTM`    VARCHAR(14)     DEFAULT NULL COMMENT '수정일시',
+    `MOD_ID`     VARCHAR(20)     DEFAULT NULL COMMENT '수정계정 아이디',
     PRIMARY KEY (`GRP_CUS_ID`)
 )
     COMMENT = '등록 가족';
@@ -567,25 +569,30 @@ CREATE TABLE `CODE_DTL`
 )
     COMMENT = '공통코드 세부관리';
 
-
 -- ======================
 -- 결제 정보
 -- ======================
 CREATE TABLE `CLS_PAY_INFO`
 (
-    `PAY_ID`     BIGINT                   NOT NULL COMMENT '결제 정보 아이디' AUTO_INCREMENT,
-    `CLS_PKG_ID` BIGINT                   NOT NULL COMMENT '회차 상품 아이디',
-    `PAID_FLAG`  ENUM ('PAY','DIS','REF') NOT NULL COMMENT '결제 구분',
-    `PAID_AMT`   INT                      NOT NULL COMMENT '금액',
-    `PAY_METHOD` ENUM ('CARD','CASH')     NOT NULL COMMENT '결제 수단',
-    `REG_DTM`    VARCHAR(14)              NOT NULL COMMENT '등록일시',
-    `REG_ID`     VARCHAR(20)              NOT NULL COMMENT '등록계정 아이디',
-    `MOD_DTM`    VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
-    `MOD_ID`     VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
+    `PAY_ID`      BIGINT                   NOT NULL COMMENT '결제 정보 아이디' AUTO_INCREMENT,
+    `CLS_PKG_ID`  BIGINT                   NOT NULL COMMENT '회차 상품 아이디',
+    `CLS_PASS_ID` BIGINT                   NOT NULL COMMENT '결제 수강권 아이디',
+    `PAID_FLAG`   ENUM ('PAY','DIS','REF') NOT NULL COMMENT '결제 구분',
+    `PAID_AMT`    INT                      NOT NULL COMMENT '금액',
+    `PAY_METHOD`  ENUM ('CARD','CASH')     NOT NULL COMMENT '결제 수단',
+    `REG_DTM`     VARCHAR(14)              NOT NULL COMMENT '등록일시',
+    `REG_ID`      VARCHAR(20)              NOT NULL COMMENT '등록계정 아이디',
+    `MOD_DTM`     VARCHAR(14) DEFAULT NULL COMMENT '수정일시',
+    `MOD_ID`      VARCHAR(20) DEFAULT NULL COMMENT '수정계정 아이디',
     PRIMARY KEY (`PAY_ID`),
     CONSTRAINT `FK_CLS_PASS_TO_CLS_PAY_INFO`
         FOREIGN KEY (`CLS_PKG_ID`)
             REFERENCES `CLS_PASS` (`CLS_PKG_ID`)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    CONSTRAINT `FK_CLS_PKG_TO_CLS_PAY_INFO`
+        FOREIGN KEY (`CLS_PASS_ID`)
+            REFERENCES `CLS_PASS` (`CLS_PASS_ID`)
             ON UPDATE CASCADE
             ON DELETE CASCADE
 )
@@ -652,9 +659,9 @@ CREATE TABLE `CAL_MST`
 -- ======================
 CREATE TABLE `CAL_REL`
 (
-    `CAL_ID`   BIGINT                                                                   NOT NULL COMMENT '캘린더 아이디',
-    `CAL_TYPE` ENUM ('SCH_MST', 'SCH_HIST', 'SCH_FIX', 'OFF_DAY', 'HOL_DAY', 'CEN_OFF') NOT NULL COMMENT '캘린더 타입',
-    `TAR_ID`   BIGINT                                                                   NOT NULL COMMENT '대상 아이디',
+    `CAL_ID`   BIGINT                                                                   			NOT NULL COMMENT '캘린더 아이디',
+    `CAL_TYPE` ENUM ('SCH_MST', 'SCH_HIST', 'SCH_FIX', 'OFF_DAY', 'HOL_DAY', 'CEN_OFF', 'ACCT_RES') NOT NULL COMMENT '캘린더 타입',
+    `TAR_ID`   BIGINT                                                                   			NOT NULL COMMENT '대상 아이디',
     PRIMARY KEY (`CAL_ID`, `CAL_TYPE`, `TAR_ID`)
 )
     COMMENT = '캘린더 관계';
@@ -877,7 +884,58 @@ END$$
 
 DELIMITER ;
 
-
+-- ======================
+-- 고객 마스터 테이블 뷰
+-- ======================
+CREATE VIEW CUS_MST_VIEW AS
+SELECT T1.MST_ID,
+       T1.NAME,
+       T1.CONTACT,
+       T1.GENDER,
+       T1.BIRTH_DATE,
+       T1.BLACK_YN,
+       T1.REMARK                                                         AS MST_REMARK,
+       CASE
+           WHEN T2.MST_ID IS NOT NULL THEN 'C'
+           WHEN T3.MST_ID IS NOT NULL THEN 'R'
+           WHEN T4.MST_ID IS NOT NULL THEN 'W'
+           END                                                           AS CUS_TYPE,
+       COALESCE(T2.HEIGHT, T3.HEIGHT, T4.HEIGHT)                         AS HEIGHT,
+       COALESCE(T2.WEIGHT, T3.WEIGHT, T4.WEIGHT)                         AS WEIGHT,
+       COALESCE(T2.DISEASE, T3.DISEASE, T4.DISEASE)                      AS DISEASE,
+       COALESCE(T2.SUR_HIST, T3.SUR_HIST, T4.SUR_HIST)                   AS SUR_HIST,
+       COALESCE(T2.BODY_CHECK_IMG, T3.BODY_CHECK_IMG, T4.BODY_CHECK_IMG) AS BODY_CHECK_IMG,
+       COALESCE(T2.REMARK, T3.REMARK, T4.REMARK)                         AS REMARK,
+       COALESCE(T3.LAST_CLS_DATE, T4.LAST_CLS_DATE)                      AS LAST_CLS_DATE,
+       COALESCE(T3.FAM_CUS_YN, T4.FAM_CUS_YN)                            AS FAM_CUS_YN,
+       T2.CONS_DATE,
+       T3.FX_CLS_YN,
+       T3.FX_CLS_DAY,
+       T3.FX_CLS_TM,
+       T3.REST_YN,
+       T3.REST_DTM,
+       T4.DEL_DTM,
+       T5.GRP_CUS_ID,
+       T5.CUS_ID_1,
+       T5.CUS_ID_2,
+       T5.CUS_ID_3,
+       T5.CUS_ID_4,
+       T5.CLS_FLAG,
+       T1.REG_DTM,
+       T1.REG_ID,
+       T1.MOD_DTM,
+       T1.MOD_ID
+FROM CUS_MST T1 -- 마스터
+         LEFT OUTER JOIN CUS_CONS T2 -- 상담
+                         ON T1.MST_ID = T2.MST_ID
+         LEFT OUTER JOIN CUS_REG T3 -- 등록
+                         ON T1.MST_ID = T3.MST_ID
+         LEFT OUTER JOIN CUS_WDR T4 -- 탈퇴
+                         ON T1.MST_ID = T4.MST_ID
+         LEFT OUTER JOIN CUS_GRP T5 -- 그룹
+                         ON (T1.MST_ID = T5.CUS_ID_1 OR
+                             T1.MST_ID = T5.CUS_ID_2)
+;
 -- ======================
 -- 상품-수강권-결제 정보 뷰
 -- ======================
@@ -943,13 +1001,16 @@ SELECT T4.SCHED_ID
      , T4.TRAINER_NM
      , T4.CUS_NM
      , IF(R.ACCT_OFF = 1, 'Y', 'N')                                                               AS ACCT_OFF_YN
-     , IF(R.HOL = 1, 'Y', 'N')                                                                    AS HOL_YN
+     , IF(R.ACCT_RES = 1, 'Y', 'N')                                                               AS ACCT_RES_YN     
+     , IF(R.HOL = 1, 'Y', 'N')                                                            		  AS HOL_YN
      , IF(R.HOL = 1, (SELECT HOLI_NM FROM HOLIDAY_MST WHERE HOLI_ID = T2.TAR_ID), '')             AS HOL_NM
      , IF(R.CEN_OFF = 1, 'Y', 'N')                                                                AS CENTER_OFF_YN
-     , IF(R.ACCT_OFF = 1, (SELECT CONCAT(NAME, ", ") FROM ACCT WHERE ACCT_ID = T4.ACCT_ID), NULL) AS OFF_ACCT_NM
+     , IF(R.ACCT_OFF = 1, (SELECT GROUP_CONCAT(NAME SEPARATOR ', ') FROM ACCT WHERE FIND_IN_SET(ACCT_ID, R.OFF_TAR_IDS)), NULL) AS OFF_ACCT_NM
+     , IF(R.ACCT_RES = 1, (SELECT GROUP_CONCAT(NAME SEPARATOR ', ') FROM ACCT WHERE FIND_IN_SET(ACCT_ID, R.RES_TAR_IDS)), NULL) AS RES_ACCT_NM
      , P.GRP_YN
      , IF(P.GRP_YN = 'Y', P.GRP_IDS, NULL)                                                        AS GRP_IDS
      , IF(P.GRP_YN = 'Y', P.GRP_NMS, NULL)                                                        AS GRP_NMS
+     , P.CLS_FLAG
      , T4.CLS_STATUS
      , T4.CLS_SESSION
      , T4.INJURY
@@ -976,20 +1037,26 @@ FROM CAL_MST T1
                    ON T2.CAL_ID = T1.CAL_ID
          LEFT JOIN SCHED_MST T4
                    ON T2.TAR_ID = T4.SCHED_ID
+                  AND T2.CAL_TYPE IN ('SCH_MST', 'SCH_FIX') 
          LEFT JOIN (SELECT CAL_ID
                          , MAX(CAL_TYPE = 'OFF_DAY') AS ACCT_OFF
+                         , MAX(CAL_TYPE = 'ACCT_RES') AS ACCT_RES
                          , MAX(CAL_TYPE = 'HOL_DAY') AS HOL
                          , MAX(CAL_TYPE = 'CEN_OFF') AS CEN_OFF
+						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'OFF_DAY'  THEN TAR_ID END)     AS OFF_TAR_IDS
+						 , GROUP_CONCAT(CASE WHEN CAL_TYPE = 'ACCT_RES' THEN TAR_ID END)     AS RES_TAR_IDS
                     FROM CAL_REL
+                   WHERE CAL_TYPE IN ('OFF_DAY', 'ACCT_RES', 'HOL_DAY', 'CEN_OFF') 
                     GROUP BY CAL_ID) R
                    ON R.CAL_ID = T1.CAL_ID
          LEFT JOIN (SELECT P2.MST_ID
                          , P2.STA_DTM
                          , P2.END_DTM
-                         , IF(P1.CLS_TYPE = 'IOI', 'N', 'Y')                                                 GRP_YN
+                         , IF(P1.CLS_TYPE = 'IOI', 'N', 'Y')                                              AS GRP_YN
                          , P2.GRP_CUS_ID
                          , CONCAT(F_GET_USER_NM(P3.CUS_ID_1, 'C'), ", ", F_GET_USER_NM(P3.CUS_ID_2, 'C')) AS GRP_NMS
                          , CONCAT(P3.CUS_ID_1, ", ", P3.CUS_ID_2)                                         AS GRP_IDS
+                         , P3.CLS_FLAG
                     FROM CLS_PKG P1
                              JOIN CLS_PASS P2
                                   ON P1.CLS_PKG_ID = P2.CLS_PKG_ID
@@ -1012,28 +1079,87 @@ VALUES ('03', 'TRAINER', '강사', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FOR
 INSERT INTO ROLES
 VALUES ('04', 'TIME_TRAINER', '시간 강사', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 
-
-INSERT INTO ACCT
-VALUES (1, 'PWD', '관리자01', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (2, 'PWD', '관리자02', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (3, 'PWD', '강사01', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (4, 'PWD', '강사02', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'W', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-INSERT INTO ACCT
-VALUES (5, 'PWD', '강사03', F_GET_RANDOM_CONTACT(),
-        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 20000) DAY), '%Y%m%d'), 'M', 'Y',
-        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
-
+INSERT
+/*+
+                 SET_VAR(cte_max_recursion_depth=20000)
+                 SET_VAR(net_read_timeout=600)
+                 SET_VAR(net_write_timeout=600)
+                 SET_VAR(max_execution_time=0)
+               */
+INTO CAL_MST
+( YEAR
+, MONTH
+, DAY
+, KOR_DATE
+, SCHED_DATE
+, SCHED_TIME
+, REG_DTM
+, REG_ID
+, MOD_DTM
+, MOD_ID)
+-- 지정범위 일자 구하기
+WITH RECURSIVE
+    BASE AS ( -- 100일씩 이동
+        SELECT DATE('20000101') AS D
+        UNION ALL
+        SELECT D + INTERVAL 100 DAY
+        FROM BASE
+        WHERE D <= DATE('29991231') - INTERVAL 100 DAY),
+    DIGITS AS (SELECT 0 N
+               UNION ALL
+               SELECT 1
+               UNION ALL
+               SELECT 2
+               UNION ALL
+               SELECT 3
+               UNION ALL
+               SELECT 4
+               UNION ALL
+               SELECT 5
+               UNION ALL
+               SELECT 6
+               UNION ALL
+               SELECT 7
+               UNION ALL
+               SELECT 8
+               UNION ALL
+               SELECT 9),
+    NUMS AS ( -- 0..99
+        SELECT t.N * 10 + u.N AS N
+        FROM DIGITS t
+                 CROSS JOIN DIGITS u),
+    HOURS AS ( -- 0..23
+        SELECT t.N * 10 + u.N AS H
+        FROM DIGITS t
+                 CROSS JOIN DIGITS u
+        WHERE t.N * 10 + u.N BETWEEN 9 AND 23),
+    CAL AS (SELECT DATE_ADD(BASE.D, INTERVAL NUMS.N DAY)          AS NUM_DATE
+                 , LPAD(HOURS.H, 2, '0')                          AS HOUR_24
+                 , DAYNAME(DATE_ADD(BASE.D, INTERVAL NUMS.N DAY)) AS ENG_DATE
+            FROM BASE
+                     CROSS JOIN NUMS
+                     CROSS JOIN HOURS
+            WHERE DATE_ADD(BASE.D, INTERVAL NUMS.N DAY) BETWEEN DATE('20001231') AND DATE('29991231'))
+SELECT DATE_FORMAT(NUM_DATE, '%Y')     AS YEAR
+     , DATE_FORMAT(NUM_DATE, '%m')     AS MONTH
+     , DATE_FORMAT(NUM_DATE, '%d')     AS DAY
+     , CASE ENG_DATE
+           WHEN 'Monday' THEN '월요일'
+           WHEN 'Tuesday' THEN '화요일'
+           WHEN 'Wednesday' THEN '수요일'
+           WHEN 'Thursday' THEN '목요일'
+           WHEN 'Friday' THEN '금요일'
+           WHEN 'Saturday' THEN '토요일'
+           WHEN 'Sunday' THEN '일요일'
+    END                                AS KOR_DATE
+     , DATE_FORMAT(NUM_DATE, '%Y%m%d') AS SCHED_DATE
+     , HOUR_24                         AS SCHED_TIME
+     , DATE_FORMAT(NOW(), '%Y%m%d')    AS REG_DTM
+     , 'SYS'                           AS REG_ID
+     , DATE_FORMAT(NOW(), '%Y%m%d')    AS MOD_DTM
+     , 'SYS'                           AS MOD_ID
+FROM CAL
+ORDER BY NUM_DATE, HOUR_24;
 
 INSERT INTO CODE_MST
 VALUES (1, 'PAY_DIV', '결제구분', '결제방법을 구분하기 위한 코드', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
@@ -1136,6 +1262,9 @@ VALUES ('22', '08', 'CAL_TYPE', 'HOL_DAY', '공휴일', '해당 일자가 법정
         DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 INSERT INTO CODE_DTL
 VALUES ('23', '08', 'CAL_TYPE', 'CEN_OFF', '센터 휴무일', '해당 일자가 센터 휴무일인 경우', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
+        DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
+INSERT INTO CODE_DTL
+VALUES ('24', '08', 'CAL_TYPE', 'ACCT_RES', '강사 휴식시간', '해당 시간에 강사가 휴식인 경우', 'Y', DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS',
         DATE_FORMAT(NOW(), '%Y%m%d'), 'SYS');
 
 COMMIT
