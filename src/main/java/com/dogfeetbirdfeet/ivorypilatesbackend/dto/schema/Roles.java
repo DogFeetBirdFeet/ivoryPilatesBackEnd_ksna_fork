@@ -1,6 +1,6 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.Role;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.Role;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class Roles {
 
-	private String roleId;
+	private Long roleId;
 	private Role roleNm;
 	private String roleDesc;
 	private String regDtm;

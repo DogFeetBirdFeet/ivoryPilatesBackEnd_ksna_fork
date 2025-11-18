@@ -9,12 +9,12 @@ import lombok.Data;
 @Data
 public class Career {
 
-	private String careerId;
-	private String acctId;
+	private Long careerId;
+	private Long acctId;
 	private String careerNm;
 	private String careerOrg;
 	private String careerMemo;
-	private String careerStrtDt;
+	private String careerStrDt;
 	private String careerEndDt;
 	private String regDtm;
 	private String regId;

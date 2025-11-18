@@ -1,7 +1,7 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.ClsStatus;
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.YN;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.ClsStatus;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
 
 import lombok.Data;
 
@@ -12,13 +12,11 @@ import lombok.Data;
 @Data
 public class SchedMst {
 
-	private String schedId;
-	private String acctId;
-	private String mstId;
+	private Long schedId;
+	private Long acctId;
+	private Long mstId;
 	private String trainerNm;
 	private String cusNm;
-	private String schedDate;
-	private String schedTime;
 	private ClsStatus clsStatus;
 	private String clsSession;
 	private String injury;

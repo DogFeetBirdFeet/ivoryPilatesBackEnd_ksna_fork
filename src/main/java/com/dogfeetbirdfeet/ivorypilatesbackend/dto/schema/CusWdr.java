@@ -1,6 +1,6 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.YN;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
 
 import lombok.Data;
 
@@ -12,12 +12,12 @@ import lombok.Data;
 public class CusWdr {
 
 	private String custId;
-	private String mstId;
-	private String acctId;
-	private String grpCusId;
-	private String clsPassId;
-	private Integer height;
-	private Integer weight;
+	private Long mstId;
+	private Long acctId;
+	private Long grpCusId;
+	private Long clsPassId;
+	private Float height;
+	private Float weight;
 	private String disease;
 	private String surHist;
 	private String bodyCheckImg;

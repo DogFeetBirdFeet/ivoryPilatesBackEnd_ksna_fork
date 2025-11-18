@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 public class Certificate {
 
-	private String certId;
-	private String acctId;
+	private Long certId;
+	private Long acctId;
 	private String certName;
 	private String certIssueDate;
 	private String certExpDate;
@@ -18,6 +18,5 @@ public class Certificate {
 	private String regId;
 	private String modDtm;
 	private String modId;
-
 
 }

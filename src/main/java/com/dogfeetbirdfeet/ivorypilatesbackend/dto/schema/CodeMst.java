@@ -1,6 +1,6 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.YN;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class CodeMst {
 
-	private String codeMstId;
+	private Long codeMstId;
 	private String classCd;
 	private String classNm;
 	private String comment;

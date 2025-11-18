@@ -1,7 +1,7 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.PaidFlag;
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.PayMethod;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.PaidFlag;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.PayMethod;
 
 import lombok.Data;
 
@@ -12,8 +12,8 @@ import lombok.Data;
 @Data
 public class ClsPayInfo {
 
-	private String payId;
-	private String clsPkgId;
+	private Long payId;
+	private Long clsPkgId;
 	private PaidFlag paidFlag;
 	private Integer paidAmt;
 	private PayMethod payMethod;

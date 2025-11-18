@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 public class AcctRole {
 
-	private String acctId;
-	private String roleId;
+	private Long acctId;
+	private Long roleId;
 	private String regDtm;
 	private String regId;
 	private String modDtm;

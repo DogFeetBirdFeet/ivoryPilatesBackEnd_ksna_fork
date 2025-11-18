@@ -1,6 +1,6 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.YN;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
 
 import lombok.Data;
 
@@ -11,10 +11,9 @@ import lombok.Data;
 @Data
 public class OffDayMst {
 
-	private String offId;
-	private String acctId;
+	private Long offId;
+	private Long acctId;
 	private String trainerNm;
-	private String schedDate;
 	private YN restYn;
 	private String regDtm;
 	private String regId;

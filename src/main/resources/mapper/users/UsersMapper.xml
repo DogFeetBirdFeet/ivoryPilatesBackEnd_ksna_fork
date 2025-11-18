@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dogfeetbirdfeet.ivorypilatesbackend.mapper.users.UsersMapper">
+    <select id="getCusSearch" resultType="com.dogfeetbirdfeet.ivorypilatesbackend.dto.searchdto.CusSearchDto">
+        SELECT
+            A.NAME,
+            A.GENDER,
+            A.CONTACT,
+            B.FAM_CUS_YN,
+            CASE WHEN B.FAM_CUS_YN = 'Y' THEN (
+                                                SELECT GROUP_CONCAT(M.NAME ORDER BY M.NAME SEPARATOR ', ')
+                                                  FROM CUS_GRP G
+                                                  JOIN CUS_MST M
+                                                    ON M.MST_ID IN (G.CUS_ID_1, G.CUS_ID_2, G.CUS_ID_3, G.CUS_ID_4)
+                                                 WHERE G.GRP_CUS_ID = B.GRP_CUS_ID
+                                               )
+            ELSE '-'
+            END AS GRPMEMNM
+        FROM CUS_MST A
+        JOIN CUS_REG B
+        ON A.MST_ID = B.MST_ID
+        WHERE 1=1;
+        <if test="FLAG!=NULL">
+            AND B.REST_YN = 'N'
+        </if>
+        <if test="NAME!=NULL">
+            AND A.NAME = #{name}
+        </if>
+        <if test="CONTACT!=NULL">
+            AND A.CONTACT = #{contact}
+        </if>
+    </select>
+</mapper>

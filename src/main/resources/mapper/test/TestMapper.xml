@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dogfeetbirdfeet.ivorypilatesbackend.mapper.test.TestMapper">
+
+    <select id="findAnythingByTableName"
+            resultType="map">
+        SELECT *
+        FROM ${tableName}   <!-- 식별자 치환: 주의! 반드시 검증/화이트리스트 -->
+        <where>
+            <if test="dto.payDateFrom != null and dto.payDateFrom != ''
+                  and dto.payDateTo != null and dto.payDateTo != ''">
+                AND PAY_DATE BETWEEN #{dto.payDateFrom} AND #{dto.payDateTo}
+            </if>
+            <if test="dto.refundDateFrom != null and dto.refundDateFrom != ''
+                  and dto.refundDateTo != null and dto.refundDateTo != ''">
+                AND REFUND_DTM BETWEEN #{dto.refundDateFrom} AND #{dto.refundDateTo}
+            </if>
+            <if test="dto.userId != null and dto.userId != ''">
+                AND USER_ID = #{dto.userId}
+            </if>
+            <if test="dto.mstId != null and dto.mstId != ''">
+                AND MST_ID = #{dto.mstId}
+            </if>
+            <if test="dto.acctId != null and dto.acctId != ''">
+                AND ACCT_ID = #{dto.acctId}
+            </if>
+            <if test="dto.clsPassId != null and dto.clsPassId != ''">
+                AND CLS_PASS_ID = #{dto.clsPassId}
+            </if>
+            <if test="dto.useYn != null and dto.useYn != ''">
+                AND USE_YN = #{dto.useYn}
+            </if>
+            <if test="dto.refundYn != null and dto.refundYn != ''">
+                AND REFUND_YN = #{dto.refundYn}
+            </if>
+            <if test="dto.payMethod != null and dto.payMethod != ''">
+                AND PAY_METHOD = #{dto.payMethod}
+            </if>
+            <if test="dto.schDate != null and dto.schDate != ''">
+                AND SCHED_DATE = #{dto.schDate}
+            </if>
+            <if test="dto.staDate != null and dto.staDate != ''
+                    and dto.endDate != null and dto.endDate != ''">
+                AND SCHED_DATE BETWEEN #{dto.staDate} AND #{dto.endDate}
+            </if>
+            <if test="dto.schMonth != null and dto.schMonth != ''">
+                AND SUBSTR(SCHED_DATE, 1, 6) = #{dto.schMonth}
+            </if>
+            <if test="dto.searchUserNm != null and dto.searchUserNm != ''">
+                AND CUS_NM = #{dto.searchUserNm}
+            </if>
+        </where>
+    </select>
+</mapper>

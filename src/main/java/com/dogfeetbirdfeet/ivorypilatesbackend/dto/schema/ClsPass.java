@@ -1,7 +1,7 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.PayMethod;
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.YN;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.PayMethod;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
 
 import lombok.Data;
 
@@ -12,9 +12,9 @@ import lombok.Data;
 @Data
 public class ClsPass {
 
-	private String clsPassId;
-	private String clsPkgId;
-	private String mstId;
+	private Long clsPassId;
+	private Long clsPkgId;
+	private Long mstId;
 	private String grpCusId;
 	private Integer discountAmt;
 	private Integer paidAmt;

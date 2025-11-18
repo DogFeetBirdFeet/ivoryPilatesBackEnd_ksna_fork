@@ -1,0 +1,36 @@
+package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
+
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.YN;
+
+import lombok.Data;
+
+/**
+ * @author nks
+ * @apiNote cusReg schema
+ */
+@Data
+public class CusReg {
+
+	private String custId;
+	private Long mstId;
+	private Long acctId;
+	private Long grpCusId;
+	private Long clsPkgId;
+	private Float height;
+	private Float weight;
+	private String disease;
+	private String surHist;
+	private String bodyCheckImg;
+	private YN fxClsYn;
+	private String fxClsDay;
+	private String fxClsTm;
+	private String lastClsDate;
+	private YN famCusYn;
+	private YN restYn;
+	private String restDtm;
+	private String remark;
+	private String regDtm;
+	private String regId;
+	private String modDtm;
+	private String modId;
+}

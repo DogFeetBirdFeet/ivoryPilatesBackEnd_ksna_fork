@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 public class CusGrp {
 
-	private String grpCusId;
-	private String cusId1;
-	private String cusId2;
-	private String cusId3;
-	private String cusId4;
+	private Long grpCusId;
+	private Long cusId1;
+	private Long cusId2;
+	private Long cusId3;
+	private Long cusId4;
 	private String regDtm;
 	private String regId;
 	private String modDtm;

@@ -1,6 +1,6 @@
 package com.dogfeetbirdfeet.ivorypilatesbackend.dto.schema;
 
-import com.dogfeetbirdfeet.ivorypilatesbackend.dto.Enum.Day;
+import com.dogfeetbirdfeet.ivorypilatesbackend.dto.enums.Day;
 
 import lombok.Data;
 
@@ -11,9 +11,9 @@ import lombok.Data;
 @Data
 public class SchedFx {
 
-	private String fxSchedId;
-	private String MstId;
-	private String acctId;
+	private Long fxSchedId;
+	private Long mstId;
+	private Long acctId;
 	private Day fxDay;
 	private String fxTime;
 	private String regDtm;
